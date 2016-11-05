@@ -1,19 +1,17 @@
-import edu.princeton.cs.algs4.StdIn;
 import edu.princeton.cs.algs4.StdOut;
 import edu.princeton.cs.algs4.StdRandom;
 import edu.princeton.cs.algs4.StdStats;
-import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 
 public class PercolationStats {
     private double[] means;
-    private int _trials;
+    private int trialsCount;
 
     // perform trials independent experiments on an n-by-n grid
     public PercolationStats(int n, int trials) {
         if (n <= 0 || trials <= 0) throw new IllegalArgumentException();
 
         means = new double[trials];
-        _trials = trials;
+        trialsCount = trials;
 
         for (int t = 0; t < trials; t++) {
             Percolation perc = new Percolation(n);
@@ -48,14 +46,12 @@ public class PercolationStats {
 
     // low  endpoint of 95% confidence interval
     public double confidenceLo() {
-        return mean() - 1.96 * stddev() / Math.sqrt(_trials);
-        //        return mean() - stddev();
+        return mean() - 1.96 * stddev() / Math.sqrt(trialsCount);
     }
 
     // high endpoint of 95% confidence interval
     public double confidenceHi() {
-        return mean() + 1.96 * stddev() / Math.sqrt(_trials);
-//        return mean() + stddev();
+        return mean() + 1.96 * stddev() / Math.sqrt(trialsCount);
     }
 
 

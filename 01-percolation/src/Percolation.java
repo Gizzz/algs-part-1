@@ -1,7 +1,4 @@
-import edu.princeton.cs.algs4.StdIn;
 import edu.princeton.cs.algs4.StdOut;
-import edu.princeton.cs.algs4.StdRandom;
-import edu.princeton.cs.algs4.StdStats;
 import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 
 public class Percolation {
@@ -53,6 +50,9 @@ public class Percolation {
         grid[row - 1][col - 1] = 1;
 
         if (row > 1 && isOpen(row - 1, col)) {
+            // bonus: prevent backwash
+//            if ( !(percolates() && row != gridSize) ) - doesn't work
+
             uf.union(xyTo1D(row, col), xyTo1D(row - 1, col));
         }
 
