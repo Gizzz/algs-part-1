@@ -94,11 +94,11 @@ public class Percolation {
     }
 
     private void validateRowCol(int row, int col) {
-        if (row < 1 || row > gridSize ) {
+        if (row < 1 || row > gridSize) {
             throw new IndexOutOfBoundsException("row");
         }
 
-        if (col < 1 || col > gridSize ) {
+        if (col < 1 || col > gridSize) {
             throw new IndexOutOfBoundsException("col");
         }
     }
@@ -141,7 +141,7 @@ public class Percolation {
 //            for (int j = 0; j < n; j++) {
 //                StdOut.print(percolation.grid[i][j] + " ");
 //            }
-//
+
 //            StdOut.println();
 //        }
 
