@@ -50,25 +50,22 @@ public class Percolation {
 
         if (isOpen(row, col)) return;
 
-        int rowIndex = row - 1;
-        int colIndex = col - 1;
+        grid[row - 1][col - 1] = 1;
 
-        grid[rowIndex][colIndex] = 1;
-
-        if (rowIndex > 0 && isOpen(row - 1, col)) {
-            uf.union(xyTo1D(rowIndex, colIndex), xyTo1D(rowIndex - 1, colIndex));
+        if (row > 1 && isOpen(row - 1, col)) {
+            uf.union(xyTo1D(row, col), xyTo1D(row - 1, col));
         }
 
-        if (rowIndex < gridSize - 1 && isOpen(row + 1, col)) {
-            uf.union(xyTo1D(rowIndex, colIndex), xyTo1D(rowIndex + 1, colIndex));
+        if (row < gridSize && isOpen(row + 1, col)) {
+            uf.union(xyTo1D(row, col), xyTo1D(row + 1, col));
         }
 
-        if (colIndex > 0 && isOpen(row, col - 1)) {
-            uf.union(xyTo1D(rowIndex, colIndex), xyTo1D(rowIndex, colIndex - 1));
+        if (col > 1 && isOpen(row, col - 1)) {
+            uf.union(xyTo1D(row, col), xyTo1D(row, col - 1));
         }
 
-        if (colIndex < gridSize - 1 && isOpen(row, col + 1)) {
-            uf.union(xyTo1D(rowIndex, colIndex), xyTo1D(rowIndex, colIndex + 1));
+        if (col < gridSize && isOpen(row, col + 1)) {
+            uf.union(xyTo1D(row, col), xyTo1D(row, col + 1));
         }
     }
 
@@ -76,21 +73,14 @@ public class Percolation {
     public boolean isOpen(int row, int col) {
         validateRowCol(row, col);
 
-        int rowIndex = row - 1;
-        int colIndex = col - 1;
-
-        return grid[rowIndex][colIndex] == 1;
+        return grid[row - 1][col - 1] == 1;
     }
 
     // is site (row, col) full?
     public boolean isFull(int row, int col) {
         validateRowCol(row, col);
 
-        int rowIndex = row - 1;
-        int colIndex = col - 1;
-
-        boolean isGridCellFull = isOpen(row, col) && uf.connected(virtualTopIndex, xyTo1D(rowIndex, colIndex));
-
+        boolean isGridCellFull = isOpen(row, col) && uf.connected(virtualTopIndex, xyTo1D(row, col));
         return isGridCellFull;
     }
 
@@ -109,10 +99,10 @@ public class Percolation {
         }
     }
 
-    private int xyTo1D(int rowIndex, int colIndex) {
-        validateRowCol(rowIndex + 1, colIndex + 1);
+    private int xyTo1D(int row, int col) {
+        validateRowCol(row, col);
 
-        return rowIndex * gridSize + colIndex;
+        return (row - 1) * gridSize + (col - 1);
     }
 
     public static void main(String[] args) {
