@@ -89,7 +89,9 @@ public class Percolation {
         int rowIndex = row - 1;
         int colIndex = col - 1;
 
-        return uf.connected(virtualTopIndex, xyTo1D(rowIndex, colIndex));
+        boolean isGridCellFull = isOpen(row, col) && uf.connected(virtualTopIndex, xyTo1D(rowIndex, colIndex));
+
+        return isGridCellFull;
     }
 
     // does the system percolate?
@@ -116,6 +118,9 @@ public class Percolation {
     public static void main(String[] args) {
         int n = 2;
         Percolation percolation = new Percolation(n);
+
+        StdOut.println("should not be connected: " + percolation.uf.connected(0, 2));
+
         percolation.open(1, 2);
         percolation.open(2, 2);
 
@@ -127,6 +132,6 @@ public class Percolation {
 //            StdOut.print("\n");
 //        }
 
-        StdOut.println("is connected: " + percolation.uf.connected(0, 2));
+        StdOut.println("should be connected: " + percolation.uf.connected(0, 2));
     }
 }
