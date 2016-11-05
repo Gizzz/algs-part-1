@@ -86,6 +86,10 @@ public class Percolation {
 
     // does the system percolate?
     public boolean percolates() {
+        if (gridSize == 1) {
+            return isFull(1, 1);
+        }
+
         return uf.connected(virtualTopIndex, virtualBottomIndex);
     }
 
@@ -106,22 +110,40 @@ public class Percolation {
     }
 
     public static void main(String[] args) {
-        int n = 2;
+        int n = 1;
         Percolation percolation = new Percolation(n);
 
-        StdOut.println("should not be connected: " + percolation.uf.connected(0, 2));
+        StdOut.println("for n = 1");
+        StdOut.println("should not percolate (false): " + percolation.percolates());
+
+        percolation.open(1, 1);
+
+        StdOut.println("should percolate (true): " + percolation.percolates());
+        StdOut.println();
+
+
+        n = 2;
+        percolation = new Percolation(n);
+
+        StdOut.println("for n = 2");
+        StdOut.println("should not be connected (false): " + percolation.uf.connected(0, 2));
 
         percolation.open(1, 2);
         percolation.open(2, 2);
 
+        StdOut.println("should be connected (true): " + percolation.uf.connected(0, 2));
+        StdOut.println();
+
+        // print out grid state
+
+//        StdOut.println("grid state:");
 //        for (int i = 0; i < n; i++) {
 //            for (int j = 0; j < n; j++) {
 //                StdOut.print(percolation.grid[i][j] + " ");
 //            }
 //
-//            StdOut.print("\n");
+//            StdOut.println();
 //        }
 
-        StdOut.println("should be connected: " + percolation.uf.connected(0, 2));
     }
 }
