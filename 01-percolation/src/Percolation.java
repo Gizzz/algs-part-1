@@ -6,6 +6,8 @@ public class Percolation {
     private int gridSize;
 
     private WeightedQuickUnionUF uf;
+    // for solving backwash
+    private WeightedQuickUnionUF uf2;
 
     private int virtualTopIndex;
     private int virtualBottomIndex;
@@ -27,10 +29,12 @@ public class Percolation {
         virtualTopIndex = ufSize - 2;
         virtualBottomIndex = ufSize - 1;
         uf = new WeightedQuickUnionUF(ufSize);
+        uf2 = new WeightedQuickUnionUF(ufSize);
 
         // connect nodes to virtual top
         for (int i = 0; i < n; i++) {
             uf.union(virtualTopIndex, i);
+            uf2.union(virtualTopIndex, i);
         }
 
         // connect nodes to virtual bottom
@@ -50,22 +54,23 @@ public class Percolation {
         grid[row - 1][col - 1] = 1;
 
         if (row > 1 && isOpen(row - 1, col)) {
-            // bonus: prevent backwash
-//            if ( !(percolates() && row != gridSize) ) - doesn't work
-
             uf.union(xyTo1D(row, col), xyTo1D(row - 1, col));
+            uf2.union(xyTo1D(row, col), xyTo1D(row - 1, col));
         }
 
         if (row < gridSize && isOpen(row + 1, col)) {
             uf.union(xyTo1D(row, col), xyTo1D(row + 1, col));
+            uf2.union(xyTo1D(row, col), xyTo1D(row + 1, col));
         }
 
         if (col > 1 && isOpen(row, col - 1)) {
             uf.union(xyTo1D(row, col), xyTo1D(row, col - 1));
+            uf2.union(xyTo1D(row, col), xyTo1D(row, col - 1));
         }
 
         if (col < gridSize && isOpen(row, col + 1)) {
             uf.union(xyTo1D(row, col), xyTo1D(row, col + 1));
+            uf2.union(xyTo1D(row, col), xyTo1D(row, col + 1));
         }
     }
 
@@ -80,7 +85,7 @@ public class Percolation {
     public boolean isFull(int row, int col) {
         validateRowCol(row, col);
 
-        boolean isGridCellFull = isOpen(row, col) && uf.connected(virtualTopIndex, xyTo1D(row, col));
+        boolean isGridCellFull = isOpen(row, col) && uf2.connected(virtualTopIndex, xyTo1D(row, col));
         return isGridCellFull;
     }
 
