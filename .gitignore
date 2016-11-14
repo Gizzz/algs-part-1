@@ -6,6 +6,10 @@
 01-percolation/01-percolation.iml
 01-percolation/.idea
 
+02-deque-and-random_queue/out
+02-deque-and-random_queue/02-deque-and-random_queue.iml
+02-deque-and-random_queue/.idea
+
 # =========================
 # Default settings
 # =========================
