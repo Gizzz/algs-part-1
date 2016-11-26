@@ -70,6 +70,11 @@ public class Point implements Comparable<Point> {
             return Double.POSITIVE_INFINITY;
         }
 
+        // if slope is horizontal
+        if (this.y == that.y) {
+            return +0.0;
+        }
+
         double slope = ((double)that.y - this.y) / (that.x - this.x);
         return slope;
     }
@@ -132,8 +137,8 @@ public class Point implements Comparable<Point> {
      * Unit tests the Point data type.
      */
     public static void main(String[] args) {
-        Point p = new Point(284, 429);
-        Point q = new Point(284, 313);
+        Point p = new Point(340, 132);
+        Point q = new Point(131, 132);
 
         StdOut.println(p.slopeTo(q));
     }
