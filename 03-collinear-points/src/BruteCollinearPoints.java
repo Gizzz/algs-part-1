@@ -2,9 +2,17 @@ import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.StdDraw;
 import edu.princeton.cs.algs4.StdOut;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 public class BruteCollinearPoints {
+    private ArrayList<LineSegment> segmentsList = new ArrayList<>();
+    private int segmentsCount = 0;
+
     // finds all line segments containing 4 points
     public BruteCollinearPoints(Point[] points) {
+        // argument checks
+
         if (points == null) throw new NullPointerException();
 
         for (Point p :  points) {
@@ -19,19 +27,38 @@ public class BruteCollinearPoints {
             }
         }
 
-        if (points.length <= 1) {
 
+        if (points.length <= 3) return;
+
+        for (int i = 0; i < points.length - 3; i++) {
+            for (int j = i + 1; j < points.length - 2; j++) {
+                for (int k = j + 1; k < points.length - 1; k++) {
+                    for (int l = k + 1; l < points.length; l++) {
+                        double slope1 = points[i].slopeTo(points[j]);
+                        double slope2 = points[i].slopeTo(points[k]);
+                        double slope3 = points[i].slopeTo(points[l]);
+
+                        if (slope1 == slope2 && slope2  == slope3) {
+                            Point[] segmentPoints = new Point[] { points[i], points[j], points[k], points[l] };
+                            Arrays.sort(segmentPoints);
+
+                            segmentsList.add(new LineSegment(segmentPoints[0], segmentPoints[3]));
+                            segmentsCount += 1;
+                        }
+                    }
+                }
+            }
         }
     }
 
     // the number of line segments
     public int numberOfSegments() {
-        return 0;
+        return segmentsCount;
     }
 
     // the line segments
     public LineSegment[] segments() {
-        return null;
+        return segmentsList.toArray(new LineSegment[segmentsList.size()]);
     }
 
     public static void main(String[] args) {
