@@ -85,19 +85,13 @@ public class FastCollinearPoints {
         Arrays.sort(segmentPoints);
 
         boolean isSegmentExists = false;
+        String segmentDirectString = new LineSegment(segmentPoints[0], segmentPoints[segmentPoints.length - 1]).toString();
+        String segmentReverseString = new LineSegment(segmentPoints[segmentPoints.length - 1], segmentPoints[0]).toString();
 
-        LineSegment[] segmentsArray = segments();
-        LineSegment segmentVariant1 =
-                new LineSegment(segmentPoints[0], segmentPoints[segmentPoints.length - 1]);
-        LineSegment segmentVariant2 =
-                new LineSegment(segmentPoints[segmentPoints.length - 1], segmentPoints[0]);
+        for (LineSegment currentSegment : segmentsList) {
+            String currentSegmentString = currentSegment.toString();
 
-        for (int k = 0; k < segmentsArray.length; k++) {
-            String currentSegmentString =  segmentsArray[k].toString();
-            String segmentVar1String =  segmentVariant1.toString();
-            String segmentVar2String =  segmentVariant2.toString();
-
-            if (currentSegmentString.equals(segmentVar1String) || currentSegmentString.equals(segmentVar2String)) {
+            if (currentSegmentString.equals(segmentDirectString) || currentSegmentString.equals(segmentReverseString)) {
                 isSegmentExists = true;
             }
         }
