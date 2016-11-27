@@ -1,6 +1,7 @@
 import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.StdDraw;
 import edu.princeton.cs.algs4.StdOut;
+import edu.princeton.cs.algs4.Stopwatch;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -148,11 +149,17 @@ public class FastCollinearPoints {
         StdDraw.show();
 
         // print and draw the line segments
+        Stopwatch sw = new Stopwatch();
         FastCollinearPoints collinear = new FastCollinearPoints(points);
+        double elapsedTime = sw.elapsedTime();
+
         for (LineSegment segment : collinear.segments()) {
             StdOut.println(segment);
             segment.draw();
         }
         StdDraw.show();
+
+        StdOut.println();
+        StdOut.printf("N=%d elapsedTime=%f", n, elapsedTime);
     }
 }
