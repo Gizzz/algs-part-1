@@ -11,6 +11,7 @@ public class FastCollinearPoints {
 
     // finds all line segments containing 4 or more points
     public FastCollinearPoints(Point[] points) {
+
         // argument checks
 
         if (points == null) throw new NullPointerException();
@@ -45,53 +46,65 @@ public class FastCollinearPoints {
             Arrays.sort(otherPoints, originPoint.slopeOrder());
 
             Double prevSlope = null;
-            int slopeCounter = 0;
+            int sameSlopePointsCount = 0;
 
             for (int j = 0; j < otherPoints.length; j++) {
                 double slope = originPoint.slopeTo(otherPoints[j]);
 
                 if (prevSlope == null || slope == prevSlope) {
-                    slopeCounter += 1;
+                    sameSlopePointsCount += 1;
 
                     boolean lastPoint = (j == otherPoints.length - 1);
-                    if (lastPoint && slopeCounter >= 3) {
-                        Point[] segmentPoints = new Point[slopeCounter + 1];
-                        int segmentPointsIndex = 0;
-
-                        for (int k = j - (slopeCounter - 1); k <= j; k++) {
-                            segmentPoints[segmentPointsIndex] = otherPoints[k];
-                            segmentPointsIndex += 1;
-                        }
-
-                        segmentPoints[segmentPoints.length - 1] = originPoint;
-                        Arrays.sort(segmentPoints);
-
-                        segmentsList.add(new LineSegment(segmentPoints[0], segmentPoints[segmentPoints.length - 1]));
-                        segmentsCount += 1;
+                    if (lastPoint && sameSlopePointsCount >= 3) {
+                        createAndAddSegment(originPoint, otherPoints, j, sameSlopePointsCount);
                     }
 
                 } else {
-                    if (slopeCounter >= 3) {
-                        Point[] segmentPoints = new Point[slopeCounter + 1];
-                        int segmentPointsIndex = 0;
-
-                        for (int k = j - (slopeCounter - 1); k <= j; k++) {
-                            segmentPoints[segmentPointsIndex] = otherPoints[k];
-                            segmentPointsIndex += 1;
-                        }
-
-                        segmentPoints[segmentPoints.length - 1] = originPoint;
-                        Arrays.sort(segmentPoints);
-
-                        segmentsList.add(new LineSegment(segmentPoints[0], segmentPoints[segmentPoints.length - 1]));
-                        segmentsCount += 1;
+                    if (sameSlopePointsCount >= 3) {
+                        createAndAddSegment(originPoint, otherPoints, j, sameSlopePointsCount);
                     }
 
-                    slopeCounter = 1;
+                    sameSlopePointsCount = 1;
                 }
 
                 prevSlope = slope;
             }
+        }
+    }
+
+    private void createAndAddSegment(Point originPoint, Point[] otherPoints, int current_otherPoints_index, int sameSlopePointsCount) {
+        Point[] segmentPoints = new Point[sameSlopePointsCount + 1];
+        int segmentPointsIndex = 0;
+
+        for (int k = current_otherPoints_index - (sameSlopePointsCount - 1); k <= current_otherPoints_index; k++) {
+            segmentPoints[segmentPointsIndex] = otherPoints[k];
+            segmentPointsIndex += 1;
+        }
+
+        segmentPoints[segmentPoints.length - 1] = originPoint;
+        Arrays.sort(segmentPoints);
+
+        boolean isSegmentExists = false;
+
+        LineSegment[] segmentsArray = segments();
+        LineSegment segmentVariant1 =
+                new LineSegment(segmentPoints[0], segmentPoints[segmentPoints.length - 1]);
+        LineSegment segmentVariant2 =
+                new LineSegment(segmentPoints[segmentPoints.length - 1], segmentPoints[0]);
+
+        for (int k = 0; k < segmentsArray.length; k++) {
+            String currentSegmentString =  segmentsArray[k].toString();
+            String segmentVar1String =  segmentVariant1.toString();
+            String segmentVar2String =  segmentVariant2.toString();
+
+            if (currentSegmentString.equals(segmentVar1String) || currentSegmentString.equals(segmentVar2String)) {
+                isSegmentExists = true;
+            }
+        }
+
+        if (!isSegmentExists) {
+            segmentsList.add(new LineSegment(segmentPoints[0], segmentPoints[segmentPoints.length - 1]));
+            segmentsCount += 1;
         }
     }
 
