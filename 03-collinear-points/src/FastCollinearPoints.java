@@ -11,23 +11,7 @@ public class FastCollinearPoints {
 
     // finds all line segments containing 4 or more points
     public FastCollinearPoints(Point[] points) {
-
-        // argument checks
-
-        if (points == null) throw new NullPointerException();
-
-        for (Point p :  points) {
-            if (p == null) throw new NullPointerException();
-        }
-
-        if (points.length > 1) {
-            for (int i = 0; i < points.length; i++) {
-                for (int j = i + 1; j < points.length; j++) {
-                    if (points[i].compareTo(points[j]) == 0) throw new IllegalArgumentException();
-                }
-            }
-        }
-
+        checkPointsArray(points);
 
         if (points.length < 4) return;
 
@@ -49,7 +33,8 @@ public class FastCollinearPoints {
             int sameSlopePointsCount = 0;
 
             for (int j = 0; j < otherPoints.length; j++) {
-                double slope = originPoint.slopeTo(otherPoints[j]);
+                Point currentPoint = otherPoints[j];
+                double slope = originPoint.slopeTo(currentPoint);
 
                 if (prevSlope == null || slope == prevSlope) {
                     sameSlopePointsCount += 1;
@@ -61,7 +46,7 @@ public class FastCollinearPoints {
 
                 } else {
                     if (sameSlopePointsCount >= 3) {
-                        createAndAddSegment(originPoint, otherPoints, j, sameSlopePointsCount);
+                        createAndAddSegment(originPoint, otherPoints, j - 1, sameSlopePointsCount);
                     }
 
                     sameSlopePointsCount = 1;
@@ -72,11 +57,27 @@ public class FastCollinearPoints {
         }
     }
 
-    private void createAndAddSegment(Point originPoint, Point[] otherPoints, int current_otherPoints_index, int sameSlopePointsCount) {
+    private void checkPointsArray(Point[] points) {
+        if (points == null) throw new NullPointerException();
+
+        for (Point p :  points) {
+            if (p == null) throw new NullPointerException();
+        }
+
+        if (points.length > 1) {
+            for (int i = 0; i < points.length; i++) {
+                for (int j = i + 1; j < points.length; j++) {
+                    if (points[i].compareTo(points[j]) == 0) throw new IllegalArgumentException();
+                }
+            }
+        }
+    }
+
+    private void createAndAddSegment(Point originPoint, Point[] otherPoints, int lastPointIndex, int sameSlopePointsCount) {
         Point[] segmentPoints = new Point[sameSlopePointsCount + 1];
         int segmentPointsIndex = 0;
 
-        for (int k = current_otherPoints_index - (sameSlopePointsCount - 1); k <= current_otherPoints_index; k++) {
+        for (int k = lastPointIndex - (sameSlopePointsCount - 1); k <= lastPointIndex; k++) {
             segmentPoints[segmentPointsIndex] = otherPoints[k];
             segmentPointsIndex += 1;
         }
