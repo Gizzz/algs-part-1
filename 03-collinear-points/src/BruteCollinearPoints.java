@@ -61,6 +61,7 @@ public class BruteCollinearPoints {
         return segmentsList.toArray(new LineSegment[segmentsList.size()]);
     }
 
+
     public static void main(String[] args) {
 
         // read the n points from a file
