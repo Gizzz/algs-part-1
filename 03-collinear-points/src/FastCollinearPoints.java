@@ -7,7 +7,7 @@ import java.util.Arrays;
 
 public class FastCollinearPoints {
     private ArrayList<LineSegment> segmentsList = new ArrayList<>();
-    private int segmentsCount = 0;
+    private ArrayList<Point[]> pointsBySegmentList = new ArrayList<>();
 
     // finds all line segments containing 4 or more points
     public FastCollinearPoints(Point[] points) {
@@ -55,6 +55,31 @@ public class FastCollinearPoints {
                 prevSlope = slope;
             }
         }
+
+        // remove duplicate segments
+
+        for (int i = 0; i < pointsBySegmentList.size(); i++) {
+            Point[] outerSegment =  pointsBySegmentList.get(i);
+            boolean copyToList = true;
+
+            for (int j = i + 1; j < pointsBySegmentList.size(); j++) {
+                Point[] innerSegment =  pointsBySegmentList.get(j);
+
+                boolean isSegmentsEqual =
+                        outerSegment[0].compareTo(innerSegment[0]) == 0
+                        &&
+                        outerSegment[1].compareTo(innerSegment[1]) == 0;
+
+                if (isSegmentsEqual) {
+                    copyToList = false;
+                }
+            }
+
+            if (copyToList) {
+                LineSegment ls = new LineSegment(outerSegment[0], outerSegment[1]);
+                segmentsList.add(ls);
+            }
+        }
     }
 
     private void checkPointsArray(Point[] points) {
@@ -85,27 +110,14 @@ public class FastCollinearPoints {
         segmentPoints[segmentPoints.length - 1] = originPoint;
         Arrays.sort(segmentPoints);
 
-        boolean isSegmentExists = false;
-        String segmentDirectString = new LineSegment(segmentPoints[0], segmentPoints[segmentPoints.length - 1]).toString();
-        String segmentReverseString = new LineSegment(segmentPoints[segmentPoints.length - 1], segmentPoints[0]).toString();
+        Point[] pointsBySegment = new Point[] { segmentPoints[0], segmentPoints[segmentPoints.length - 1] };
+        pointsBySegmentList.add(pointsBySegment);
 
-        for (LineSegment currentSegment : segmentsList) {
-            String currentSegmentString = currentSegment.toString();
-
-            if (currentSegmentString.equals(segmentDirectString) || currentSegmentString.equals(segmentReverseString)) {
-                isSegmentExists = true;
-            }
-        }
-
-        if (!isSegmentExists) {
-            segmentsList.add(new LineSegment(segmentPoints[0], segmentPoints[segmentPoints.length - 1]));
-            segmentsCount += 1;
-        }
     }
 
     // the number of line segments
     public int numberOfSegments() {
-        return segmentsCount;
+        return segmentsList.size();
     }
 
     // the line segments
