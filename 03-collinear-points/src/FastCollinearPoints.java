@@ -16,7 +16,7 @@ public class FastCollinearPoints {
 
         if (points.length < 4) return;
 
-        for (int i = 0; i < points.length; i++) {
+        for (int i = 0; i < points.length - 3; i++) {
             Point originPoint = points[i];
             Point[] otherPoints = new Point[points.length - 1];
             int otherPointsIndex = 0;
