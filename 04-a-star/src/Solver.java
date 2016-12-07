@@ -15,7 +15,11 @@ public class Solver {
         }
 
         public int compareTo(SearchNode that) {
-            return this.priority() - that.priority();
+            int diff = this.priority() - that.priority();
+            if (diff != 0) return diff;
+
+            // break ties by manhattan distance
+            return this.board.manhattan() - that.board.manhattan();
         }
 
         private int priority() {
