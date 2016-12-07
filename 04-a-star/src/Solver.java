@@ -27,35 +27,58 @@ public class Solver {
     public Solver(Board initial) {
         if (initial == null) throw new NullPointerException();
 
-//        Board twin = initial.twin();
+        Board twinBoard = initial.twin();
 
-        SearchNode initialSearchNode = new SearchNode(initial, null, 0);
+        SearchNode initialNode = new SearchNode(initial, null, 0);
+        SearchNode twinInitialNode = new SearchNode(twinBoard, null, 0);
 
         MinPQ<SearchNode> queue = new MinPQ<>();
-        queue.insert(initialSearchNode);
+        MinPQ<SearchNode> twinQueue = new MinPQ<>();
+        queue.insert(initialNode);
+        twinQueue.insert(twinInitialNode);
 
-        SearchNode currentSearchNode = queue.delMin();
+        SearchNode currentNode = queue.delMin();
+        SearchNode twinCurrentNode = twinQueue.delMin();
         int moves = 1;
 
-        while (!currentSearchNode.board.isGoal()) {
-            Iterable<Board> neighbors = currentSearchNode.board.neighbors();
+        while (!currentNode.board.isGoal() && !twinCurrentNode.board.isGoal()) {
+            Iterable<Board> neighbors = currentNode.board.neighbors();
             for (Board b : neighbors) {
-                if (currentSearchNode.prevSearchNode != null && b == currentSearchNode.prevSearchNode.board) {
+                if (currentNode.prevSearchNode != null && b == currentNode.prevSearchNode.board) {
                     continue;
                 }
 
-                queue.insert(new SearchNode(b, currentSearchNode, moves));
+                queue.insert(new SearchNode(b, currentNode, moves));
             }
 
-            currentSearchNode = queue.delMin();
+            Iterable<Board> twinNeighbors = twinCurrentNode.board.neighbors();
+            for (Board b : twinNeighbors) {
+                if (twinCurrentNode.prevSearchNode != null && b == twinCurrentNode.prevSearchNode.board) {
+                    continue;
+                }
+
+                twinQueue.insert(new SearchNode(b, twinCurrentNode, moves));
+            }
+
+            currentNode = queue.delMin();
+            twinCurrentNode = twinQueue.delMin();
             moves += 1;
         }
 
-        solutionSearchNode = currentSearchNode;
+        if (currentNode.board.isGoal()) {
+            solutionSearchNode = currentNode;
+        } else if (twinCurrentNode.board.isGoal()) {
+            solutionSearchNode = null;
+        } else {
+            throw new UnknownError("unexpected condition");
+        }
+
     }
 
     // is the initial board solvable?
-    public boolean isSolvable() { return true; }
+    public boolean isSolvable() {
+        return solutionSearchNode != null;
+    }
 
     // min number of moves to solve initial board; -1 if unsolvable
     public int moves() {

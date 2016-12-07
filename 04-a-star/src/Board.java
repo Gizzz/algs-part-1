@@ -107,7 +107,7 @@ public class Board {
         }
 
         // create new board and swap blocks
-        int[][] blocks = this.blocks;
+        int[][] blocks = cloneInstanceBlocks();
         int swap = blocks[i1][j1];
         blocks[i1][j1] = blocks[i2][j2];
         blocks[i2][j2] = swap;
