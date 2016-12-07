@@ -6,6 +6,8 @@ public class Solver {
         public final SearchNode prevSearchNode;
         public final int moves;
 
+        public Integer cachedPriority = null;
+
         SearchNode(Board board, SearchNode prevSearchNode, int moves) {
             this.board = board;
             this.prevSearchNode = prevSearchNode;
@@ -17,7 +19,10 @@ public class Solver {
         }
 
         private int priority() {
-            return board.manhattan() + moves;
+            if (cachedPriority != null) return cachedPriority;
+
+            cachedPriority = board.manhattan() + moves;
+            return cachedPriority;
         }
     }
 
@@ -39,7 +44,6 @@ public class Solver {
 
         SearchNode currentNode = queue.delMin();
         SearchNode twinCurrentNode = twinQueue.delMin();
-        int moves = 1;
 
         while (!currentNode.board.isGoal() && !twinCurrentNode.board.isGoal()) {
             Iterable<Board> neighbors = currentNode.board.neighbors();
@@ -48,7 +52,7 @@ public class Solver {
                     continue;
                 }
 
-                queue.insert(new SearchNode(b, currentNode, moves));
+                queue.insert(new SearchNode(b, currentNode, currentNode.moves + 1));
             }
 
             Iterable<Board> twinNeighbors = twinCurrentNode.board.neighbors();
@@ -57,12 +61,11 @@ public class Solver {
                     continue;
                 }
 
-                twinQueue.insert(new SearchNode(b, twinCurrentNode, moves));
+                twinQueue.insert(new SearchNode(b, twinCurrentNode, twinCurrentNode.moves + 1));
             }
 
             currentNode = queue.delMin();
             twinCurrentNode = twinQueue.delMin();
-            moves += 1;
         }
 
         if (currentNode.board.isGoal()) {
@@ -116,15 +119,19 @@ public class Solver {
         Board initial = new Board(blocks);
 
         // solve the puzzle
+        Stopwatch sw = new Stopwatch();
         Solver solver = new Solver(initial);
+        StdOut.println("elapsed time: " + sw.elapsedTime());
 
         // print solution to standard output
         if (!solver.isSolvable())
             StdOut.println("No solution possible");
         else {
+            StdOut.println("solution exists");
             StdOut.println("Minimum number of moves = " + solver.moves());
-            for (Board board : solver.solution())
-                StdOut.println(board);
+
+//            for (Board board : solver.solution())
+//                StdOut.println(board);
         }
     }
 }
