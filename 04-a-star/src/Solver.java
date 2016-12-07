@@ -44,7 +44,7 @@ public class Solver {
         while (!currentNode.board.isGoal() && !twinCurrentNode.board.isGoal()) {
             Iterable<Board> neighbors = currentNode.board.neighbors();
             for (Board b : neighbors) {
-                if (currentNode.prevSearchNode != null && b == currentNode.prevSearchNode.board) {
+                if (currentNode.prevSearchNode != null && b.equals(currentNode.prevSearchNode.board)) {
                     continue;
                 }
 
@@ -53,7 +53,7 @@ public class Solver {
 
             Iterable<Board> twinNeighbors = twinCurrentNode.board.neighbors();
             for (Board b : twinNeighbors) {
-                if (twinCurrentNode.prevSearchNode != null && b == twinCurrentNode.prevSearchNode.board) {
+                if (twinCurrentNode.prevSearchNode != null && b.equals(twinCurrentNode.prevSearchNode.board)) {
                     continue;
                 }
 
@@ -72,7 +72,6 @@ public class Solver {
         } else {
             throw new UnknownError("unexpected condition");
         }
-
     }
 
     // is the initial board solvable?
