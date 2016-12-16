@@ -1,6 +1,9 @@
 import edu.princeton.cs.algs4.Point2D;
 import edu.princeton.cs.algs4.RectHV;
 import edu.princeton.cs.algs4.StdDraw;
+import edu.princeton.cs.algs4.StdOut;
+
+import edu.princeton.cs.algs4.Queue;
 
 public class KdTree {
     private static class Node {
@@ -38,7 +41,6 @@ public class KdTree {
     public void insert(Point2D p) {
         if (p == null) throw new NullPointerException();
 
-        // todo: implement this
         if (contains(p)) return;
 
         if (isEmpty()) {
@@ -131,6 +133,34 @@ public class KdTree {
     public boolean contains(Point2D p) {
         if (p == null) throw new NullPointerException();
 
+        if (rootNode == null) return false;
+
+        Node currentNode = rootNode;
+        boolean is_currentNode_horizontal = false;
+
+        while (currentNode != null) {
+            double targetPointCoord;
+            double currentPointCoord;
+
+            if (is_currentNode_horizontal) {
+                targetPointCoord = p.y();
+                currentPointCoord = currentNode.point.y();
+            } else {
+                targetPointCoord = p.x();
+                currentPointCoord = currentNode.point.x();
+            }
+
+            if ( currentNode.point.toString().equals(p.toString()) ) return true;
+
+            if (targetPointCoord < currentPointCoord) {
+                currentNode = currentNode.lbNode;
+            } else {
+                currentNode = currentNode.rtNode;
+            }
+
+            is_currentNode_horizontal = !is_currentNode_horizontal;
+        }
+
         return false;
     }
 
@@ -177,7 +207,25 @@ public class KdTree {
     public Iterable<Point2D> range(RectHV rect) {
         if (rect == null) throw new NullPointerException();
 
-        return null;
+        Queue<Point2D> queue = new Queue<>();
+        rangeSearch(rootNode, rect, queue);
+
+        return queue;
+    }
+
+    private void rangeSearch(Node node, RectHV rect, Queue<Point2D> queue) {
+        if (node == null) return;
+
+        if (node.rect.intersects(rect)) {
+            if (rect.contains(node.point)) {
+                queue.enqueue(node.point);
+            }
+
+            rangeSearch(node.lbNode, rect, queue);
+            rangeSearch(node.rtNode, rect, queue);
+        }
+
+        return;
     }
 
     // a nearest neighbor in the set to point point; null if the set is empty
@@ -185,12 +233,20 @@ public class KdTree {
         if (p == null) throw new NullPointerException();
 
         return null;
+
+//        if (rootNode == null || rootNode.point == null) return null;
+//
+//        if (size == 1) return rootNode.point;
+//
+//        Node currentNode = rootNode;
+//        double minDistance = p.distanceTo(rootNode.point);
+        
+
     }
 
 
     // unit testing of the methods (optional)
     public static void main(String[] args) {
-        RectHV rect = new RectHV(0.0, 0.0, 1.0, 1.0);
         KdTree kdTree = new KdTree();
 
 
