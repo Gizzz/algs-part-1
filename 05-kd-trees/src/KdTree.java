@@ -9,6 +9,11 @@ public class KdTree {
         private Node lbNode;        // the left/bottom subtree
         private Node rtNode;        // the right/top subtree
     }
+    
+    private enum Orientation {
+        vertical,
+        horizontal
+    }
 
     private Node rootNode;
     private int size;
@@ -33,12 +38,14 @@ public class KdTree {
     public void insert(Point2D p) {
         if (p == null) throw new NullPointerException();
 
+        // todo: implement this
         if (contains(p)) return;
 
-        Node newNode = new Node();
-        newNode.point = p;
-
         if (isEmpty()) {
+            Node newNode = new Node();
+            newNode.point = p;
+            newNode.rect = new RectHV(0, 0, 1, 1);
+
             rootNode = newNode;
             size += 1;
 
@@ -46,14 +53,14 @@ public class KdTree {
         }
 
         Node currentNode = rootNode;
-        boolean isHorizontal = false;
-        boolean isLeftBottom;
+        boolean is_currentNode_horizontal = false;
+        boolean is_newNode_leftBottom;
 
         while (true) {
             double targetPointCoord;
             double currentPointCoord;
 
-            if (isHorizontal) {
+            if (is_currentNode_horizontal) {
                 targetPointCoord = p.y();
                 currentPointCoord = currentNode.point.y();
             } else {
@@ -63,24 +70,55 @@ public class KdTree {
 
             if (targetPointCoord < currentPointCoord) {
                 if (currentNode.lbNode == null) {
-                    isLeftBottom = true;
+                    is_newNode_leftBottom = true;
                     break;
                 }
 
                 currentNode = currentNode.lbNode;
             } else {
                 if (currentNode.rtNode == null) {
-                    isLeftBottom = false;
+                    is_newNode_leftBottom = false;
                     break;
                 }
 
                 currentNode = currentNode.rtNode;
             }
 
-            isHorizontal = !isHorizontal;
+            is_currentNode_horizontal = !is_currentNode_horizontal;
         }
 
-        if (isLeftBottom) {
+        boolean is_newNode_horizontal = !is_currentNode_horizontal;
+
+        Node newNode = new Node();
+        newNode.point = p;
+
+        if (is_newNode_horizontal) {
+            if (is_newNode_leftBottom) {
+                newNode.rect = new RectHV(
+                        currentNode.rect.xmin(), currentNode.rect.ymin(),
+                        currentNode.point.x(), currentNode.rect.ymax()
+                );
+            } else {
+                newNode.rect = new RectHV(
+                        currentNode.point.x(), currentNode.rect.ymin(),
+                        currentNode.rect.xmax(), currentNode.rect.ymax()
+                );
+            }
+        } else /* if new node vertical */ {
+            if (is_newNode_leftBottom) {
+                newNode.rect = new RectHV(
+                        currentNode.rect.xmin(), currentNode.rect.ymin(),
+                        currentNode.rect.xmax(), currentNode.point.y()
+                );
+            } else {
+                newNode.rect = new RectHV(
+                        currentNode.rect.xmin(), currentNode.point.y(),
+                        currentNode.rect.xmax(), currentNode.rect.ymax()
+                );
+            }
+        }
+
+        if (is_newNode_leftBottom) {
             currentNode.lbNode = newNode;
         } else {
             currentNode.rtNode = newNode;
@@ -98,52 +136,41 @@ public class KdTree {
 
     // draw all points to standard draw
     public void draw() {
-//        StdDraw.setPenColor(StdDraw.BLACK);
-//        StdDraw.setPenRadius(0.01);
-//        StdDraw.line(.0, .0, 1, 1);
-//        rootNode.point.draw();
+        draw(rootNode, Orientation.vertical);
+    }
 
-        if (rootNode == null) return;
+    private void draw(Node currentNode, Orientation orientation) {
+        if (currentNode == null) return;
 
-        Node currentNode = rootNode;
-
-        // draw vertical line
-        StdDraw.setPenColor(StdDraw.RED);
-        StdDraw.setPenRadius();
-        StdDraw.line(currentNode.point.x(), 1, currentNode.point.x(), 0);
+        if (orientation == Orientation.vertical) {
+            // draw vertical line
+            StdDraw.setPenColor(StdDraw.RED);
+            StdDraw.setPenRadius();
+            StdDraw.line(
+                    currentNode.point.x(), currentNode.rect.ymin(), 
+                    currentNode.point.x(), currentNode.rect.ymax()
+            );
+        } else {
+            // draw horizontal line
+            StdDraw.setPenColor(StdDraw.BLUE);
+            StdDraw.setPenRadius();
+            StdDraw.line(
+                    currentNode.rect.xmin(), currentNode.point.y(), 
+                    currentNode.rect.xmax(), currentNode.point.y()
+            );
+        }
 
         //draw point
         StdDraw.setPenColor();
         StdDraw.setPenRadius(0.01);
         currentNode.point.draw();
-
-        if (currentNode.lbNode != null) {
-            Node childNode = currentNode.lbNode;
-
-            // draw horizontal line
-            StdDraw.setPenColor(StdDraw.BLUE);
-            StdDraw.setPenRadius();
-            StdDraw.line(0, childNode.point.y(), currentNode.point.x(), childNode.point.y());
-
-            //draw point
-            StdDraw.setPenColor();
-            StdDraw.setPenRadius(0.01);
-            childNode.point.draw();
-        }
-
-        if (currentNode.rtNode != null) {
-            Node childNode = currentNode.rtNode;
-
-            // draw horizontal line
-            StdDraw.setPenColor(StdDraw.BLUE);
-            StdDraw.setPenRadius();
-            StdDraw.line(currentNode.point.x(), childNode.point.y(), 1, childNode.point.y());
-
-            //draw point
-            StdDraw.setPenColor();
-            StdDraw.setPenRadius(0.01);
-            childNode.point.draw();
-        }
+        
+        Orientation childOrientation = orientation == Orientation.vertical 
+                                        ? Orientation.horizontal 
+                                        : Orientation.vertical;
+        
+        draw(currentNode.lbNode, childOrientation);
+        draw(currentNode.rtNode, childOrientation);
     }
 
     // all points that are inside the rectangle
@@ -166,30 +193,25 @@ public class KdTree {
         RectHV rect = new RectHV(0.0, 0.0, 1.0, 1.0);
         KdTree kdTree = new KdTree();
 
-        kdTree.insert(new Point2D(.5, .5));
-        kdTree.insert(new Point2D(.25, .25));
-        kdTree.insert(new Point2D(.75, .75));
+
+//        kdTree.insert(new Point2D(.5, .5));
+//
+//        kdTree.insert(new Point2D(.25, .25));
+//        kdTree.insert(new Point2D(.75, .75));
+//
+//        kdTree.insert(new Point2D(.125, .125));
+//        kdTree.insert(new Point2D(.375, .375));
+//        kdTree.insert(new Point2D(.625, .625));
+//        kdTree.insert(new Point2D(.875, .875));
+
+        kdTree.insert(new Point2D(.7, .2));
+        kdTree.insert(new Point2D(.5, .4));
+        kdTree.insert(new Point2D(.2, .3));
+        kdTree.insert(new Point2D(.4, .7));
+        kdTree.insert(new Point2D(.9, .6));
+
+
         kdTree.draw();
         StdDraw.show();
-
-//        while (true) {
-//            if (StdDraw.mousePressed()) {
-//                double x = StdDraw.mouseX();
-//                double y = StdDraw.mouseY();
-//                StdOut.printf("%8.6f %8.6f\n", x, y);
-//                Point2D point = new Point2D(x, y);
-//
-//                if (rect.contains(point)) {
-//                    StdOut.printf("%8.6f %8.6f\n", x, y);
-//                    kdTree.insert(point);
-//                    StdDraw.clear();
-//                    kdTree.draw();
-//                    StdDraw.show();
-//                }
-//            }
-//
-//            StdDraw.pause(50);
-//        }
-
     }
 }
