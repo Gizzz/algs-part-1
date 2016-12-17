@@ -273,6 +273,7 @@ public class KdTree {
     public static void main(String[] args) {
         KdTree kdTree = new KdTree();
 
+        // my tree
 
 //        kdTree.insert(new Point2D(.5, .5));
 //
@@ -284,6 +285,8 @@ public class KdTree {
 //        kdTree.insert(new Point2D(.625, .625));
 //        kdTree.insert(new Point2D(.875, .875));
 
+
+        // example from spec
 
 //        kdTree.insert(new Point2D(.7, .2));
 //        kdTree.insert(new Point2D(.5, .4));
