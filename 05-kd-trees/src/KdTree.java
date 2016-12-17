@@ -20,6 +20,7 @@ public class KdTree {
 
     private Node rootNode;
     private int size;
+    private Point2D closestPoint;
 
     // construct an empty set of points
     public KdTree() {
@@ -228,20 +229,43 @@ public class KdTree {
         return;
     }
 
-    // a nearest neighbor in the set to point point; null if the set is empty
+    // a nearest neighbor in the set to point p; null if the set is empty
     public Point2D nearest(Point2D p) {
         if (p == null) throw new NullPointerException();
 
-        return null;
+        if (rootNode == null) return null;
+        if (size == 1) return rootNode.point;
 
-//        if (rootNode == null || rootNode.point == null) return null;
-//
-//        if (size == 1) return rootNode.point;
-//
-//        Node currentNode = rootNode;
-//        double minDistance = p.distanceTo(rootNode.point);
-        
+        closestPoint = rootNode.point;
+        nearestSearch(rootNode, p);
 
+        return closestPoint;
+    }
+
+    private void nearestSearch(Node currentNode, Point2D targetPoint) {
+        if (currentNode == null) return;
+
+        if (currentNode.rect.distanceTo(targetPoint) > closestPoint.distanceTo(targetPoint)) {
+            return;
+        }
+
+        if (currentNode.point.distanceTo(targetPoint) < closestPoint.distanceTo(targetPoint)) {
+            closestPoint = currentNode.point;
+        }
+
+        boolean isLbSideContainsPoint = false;
+
+        if (currentNode.lbNode != null) {
+            isLbSideContainsPoint = currentNode.lbNode.rect.contains(targetPoint);
+        }
+
+        if (isLbSideContainsPoint) {
+            nearestSearch(currentNode.lbNode, targetPoint);
+            nearestSearch(currentNode.rtNode, targetPoint);
+        } else {
+            nearestSearch(currentNode.rtNode, targetPoint);
+            nearestSearch(currentNode.lbNode, targetPoint);
+        }
     }
 
 
@@ -260,14 +284,26 @@ public class KdTree {
 //        kdTree.insert(new Point2D(.625, .625));
 //        kdTree.insert(new Point2D(.875, .875));
 
-        kdTree.insert(new Point2D(.7, .2));
-        kdTree.insert(new Point2D(.5, .4));
-        kdTree.insert(new Point2D(.2, .3));
-        kdTree.insert(new Point2D(.4, .7));
-        kdTree.insert(new Point2D(.9, .6));
+
+//        kdTree.insert(new Point2D(.7, .2));
+//        kdTree.insert(new Point2D(.5, .4));
+//        kdTree.insert(new Point2D(.2, .3));
+//        kdTree.insert(new Point2D(.4, .7));
+//        kdTree.insert(new Point2D(.9, .6));
+
+
+        // cirlcle
+        kdTree.insert(new Point2D(.0, .5));
+        kdTree.insert(new Point2D(.5, 1));
+        kdTree.insert(new Point2D(.5, .0));
+        kdTree.insert(new Point2D(1, .5));
+
 
 
         kdTree.draw();
         StdDraw.show();
+
+        Point2D point = new Point2D(.5, .1);
+        StdOut.println(kdTree.nearest(point));
     }
 }
