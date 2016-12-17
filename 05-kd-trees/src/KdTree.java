@@ -245,11 +245,11 @@ public class KdTree {
     private void nearestSearch(Node currentNode, Point2D targetPoint) {
         if (currentNode == null) return;
 
-        if (currentNode.rect.distanceTo(targetPoint) > closestPoint.distanceTo(targetPoint)) {
+        if (currentNode.rect.distanceSquaredTo(targetPoint) > closestPoint.distanceSquaredTo(targetPoint)) {
             return;
         }
 
-        if (currentNode.point.distanceTo(targetPoint) < closestPoint.distanceTo(targetPoint)) {
+        if (currentNode.point.distanceSquaredTo(targetPoint) < closestPoint.distanceSquaredTo(targetPoint)) {
             closestPoint = currentNode.point;
         }
 
